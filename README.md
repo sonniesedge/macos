@@ -1,4 +1,4 @@
-# laptop
+# MacOS Config
 
 Ansible roles and playbooks that set up a work laptop on macOS. The playbook
 runs against `localhost` with a local connection. No SSH is necessary.
