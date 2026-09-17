@@ -1,0 +1,23 @@
+---
+- name: Apply macOS defaults
+  community.general.osx_defaults:
+    domain: "{{ item.domain }}"
+    host: "{{ item.host | default(omit) }}"
+    key: "{{ item.key }}"
+    type: "{{ item.type | default(omit) if item.state | default('present') != 'absent' else omit }}"
+    value: "{{ item.value | default(omit) if item.state | default('present') != 'absent' else omit }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ macos_defaults }}"
+  loop_control:
+    label: "{{ item.domain }} {{ item.key }} ({{ item.state | default('present') }})"
+  notify: Restart affected apps
+
+- name: Set the computer name
+  ansible.builtin.command: "scutil --set {{ item }} {{ macos_computer_name }}"
+  become: true
+  loop:
+    - ComputerName
+    - HostName
+    - LocalHostName
+  when: macos_computer_name | length > 0
+  changed_when: true

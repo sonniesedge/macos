@@ -1,0 +1,13 @@
+---
+dotfiles_home: "{{ ansible_facts['env'].HOME }}"
+
+zsh_theme: robbyrussell
+zsh_plugins: []
+zsh_env: {}
+zsh_secrets: {}
+zsh_path_prepend: []
+zsh_extra_lines: []
+
+oh_my_zsh_dir: "{{ dotfiles_home }}/.oh-my-zsh"
+oh_my_zsh_install: true
+

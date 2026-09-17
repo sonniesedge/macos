@@ -1,0 +1,6 @@
+*.retry
+.DS_Store
+collections/
+
+# Backups written by the dotfiles role
+*.zshrc.*~

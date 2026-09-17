@@ -1,0 +1,30 @@
+---
+- name: Install Oh My Zsh
+  ansible.builtin.git:
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: "{{ oh_my_zsh_dir }}"
+    depth: 1
+    version: master
+    update: false
+  when: oh_my_zsh_install | bool
+
+- name: Write ~/.zshrc
+  ansible.builtin.template:
+    src: zshrc.j2
+    dest: "{{ dotfiles_home }}/.zshrc"
+    mode: "0600"
+    backup: true
+  no_log: true
+  tags: [secrets]
+
+- name: Make sure ~/.zshrc.local exists for unmanaged tweaks
+  ansible.builtin.copy:
+    dest: "{{ dotfiles_home }}/.zshrc.local"
+    content: "# Machine-specific settings. Not managed by Ansible.\n"
+    mode: "0600"
+    force: false
+
+- name: Remove chezmoi
+  ansible.builtin.import_tasks: remove_chezmoi.yaml
+  when: chezmoi_remove | bool
+  tags: [chezmoi-cleanup]

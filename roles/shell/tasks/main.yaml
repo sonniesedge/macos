@@ -1,0 +1,17 @@
+---
+- name: Read the current login shell
+  ansible.builtin.command: "dscl . -read /Users/{{ ansible_facts['user_id'] }} UserShell"
+  register: shell_current
+  changed_when: false
+  check_mode: false
+
+- name: Record the current login shell as a fact
+  ansible.builtin.set_fact:
+    shell_current_path: "{{ shell_current.stdout.split(' ') | last }}"
+
+- name: Report how to change the login shell
+  ansible.builtin.debug:
+    msg:
+      - "Login shell is {{ shell_current_path }}, wanted {{ shell_default }}."
+      - "Change it by hand. Run 'chsh -s {{ shell_default }}'."
+  when: shell_current_path != shell_default

@@ -1,0 +1,7 @@
+---
+- name: Restart affected apps
+  ansible.builtin.command: "killall {{ item }}"
+  loop: "{{ macos_apps_to_restart }}"
+  register: macos_killall
+  changed_when: macos_killall.rc == 0
+  failed_when: false

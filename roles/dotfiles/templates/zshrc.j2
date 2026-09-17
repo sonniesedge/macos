@@ -1,0 +1,46 @@
+# Managed by Ansible. Edit group_vars/all.yaml, not this file.
+# Contains secrets. Mode is 0600.
+
+# --- GPG ---------------------------------------------------------------------
+export GPG_TTY=$(tty)
+gpgconf --launch gpg-agent
+
+# --- Homebrew ----------------------------------------------------------------
+eval "$({{ homebrew_prefix }}/bin/brew shellenv)"
+
+# --- Environment -------------------------------------------------------------
+{% for key, value in zsh_env | dictsort %}
+export {{ key }}={{ value | quote }}
+{% endfor %}
+
+# --- Secrets from 1Password --------------------------------------------------
+{% for key, item in zsh_secrets | dictsort %}
+export {{ key }}={{ lookup('community.general.onepassword', item.uuid, field=item.field | default('notesPlain')) | quote }}
+{% endfor %}
+
+# --- Oh My Zsh ---------------------------------------------------------------
+export ZSH="{{ oh_my_zsh_dir }}"
+ZSH_THEME={{ zsh_theme | quote }}
+plugins=({{ zsh_plugins | join(' ') }})
+source $ZSH/oh-my-zsh.sh
+
+# --- Node Version Manager ----------------------------------------------------
+export NVM_DIR="$HOME/.nvm"
+[ -s "{{ homebrew_prefix }}/opt/nvm/nvm.sh" ] && \. "{{ homebrew_prefix }}/opt/nvm/nvm.sh"
+[ -s "{{ homebrew_prefix }}/opt/nvm/etc/bash_completion.d/nvm" ] && \. "{{ homebrew_prefix }}/opt/nvm/etc/bash_completion.d/nvm"
+
+# --- PATH --------------------------------------------------------------------
+{% for entry in zsh_path_prepend %}
+export PATH={{ entry | quote }}:$PATH
+{% endfor %}
+{% if zsh_extra_lines %}
+
+# --- Extra -------------------------------------------------------------------
+{% for line in zsh_extra_lines %}
+{{ line }}
+{% endfor %}
+{% endif %}
+
+# --- Local overrides ---------------------------------------------------------
+# Unmanaged. Put machine-specific tweaks here.
+[ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"

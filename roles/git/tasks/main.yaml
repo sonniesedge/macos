@@ -1,0 +1,66 @@
+---
+- name: Set git identity
+  community.general.git_config:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    scope: global
+  loop: "{{ git_identity | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when: item.value | length > 0
+  vars:
+    git_identity:
+      user.name: "{{ git_user_name }}"
+      user.email: "{{ git_user_email }}"
+      user.signingkey: "{{ git_signing_key }}"
+
+- name: Set global git options
+  community.general.git_config:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    scope: global
+  loop: "{{ git_config | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: Set global git aliases
+  community.general.git_config:
+    name: "alias.{{ item.key }}"
+    value: "{{ item.value }}"
+    scope: global
+  loop: "{{ git_aliases | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: Write the global gitignore file
+  ansible.builtin.copy:
+    dest: "{{ git_ignore_path }}"
+    content: |
+      # Managed by Ansible. Edit group_vars/all.yaml, not this file.
+      {% for pattern in git_ignore_global %}
+      {{ pattern }}
+      {% endfor %}
+    mode: "0644"
+
+- name: Point git at the global gitignore file
+  community.general.git_config:
+    name: core.excludesfile
+    value: "{{ git_ignore_path }}"
+    scope: global
+
+- name: Make sure the GnuPG home directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts['env'].HOME }}/.gnupg"
+    state: directory
+    mode: "0700"
+  when: git_signing_key | length > 0
+
+- name: Use pinentry-mac for GPG so signing works in a GUI session
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_facts['env'].HOME }}/.gnupg/gpg-agent.conf"
+    line: "pinentry-program {{ homebrew_prefix }}/bin/pinentry-mac"
+    regexp: "^pinentry-program "
+    create: true
+    mode: "0600"
+  when: git_signing_key | length > 0
+  notify: Reload gpg-agent

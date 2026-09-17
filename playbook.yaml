@@ -1,0 +1,23 @@
+---
+- name: Configure work laptop
+  hosts: laptop
+  gather_facts: true
+
+  pre_tasks:
+    - name: Fail if the host is not macOS
+      ansible.builtin.assert:
+        that: ansible_facts['system'] == 'Darwin'
+        fail_msg: "This playbook only supports macOS."
+      tags: [always]
+
+  roles:
+    - role: homebrew
+      tags: [homebrew, brew]
+    - role: git
+      tags: [git]
+    - role: shell
+      tags: [shell]
+    - role: dotfiles
+      tags: [dotfiles, zsh]
+    - role: macos
+      tags: [macos]

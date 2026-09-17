@@ -1,0 +1,32 @@
+---
+- name: Check for uncommitted changes in the chezmoi source repo
+  ansible.builtin.command:
+    cmd: git status --porcelain
+    chdir: "{{ dotfiles_home }}/.local/share/chezmoi"
+  register: chezmoi_dirty
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Refuse to delete a chezmoi source repo with uncommitted work
+  ansible.builtin.fail:
+    msg: >-
+      The chezmoi source repo has uncommitted changes. Commit or discard them,
+      then run again. Changes: {{ chezmoi_dirty.stdout_lines }}
+  when:
+    - chezmoi_dirty.rc == 0
+    - chezmoi_dirty.stdout | length > 0
+
+- name: Remove chezmoi directories and state
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ dotfiles_home }}/.local/share/chezmoi"
+    - "{{ dotfiles_home }}/.config/chezmoi"
+    - "{{ dotfiles_home }}/.cache/chezmoi"
+
+- name: Uninstall the chezmoi formula
+  community.general.homebrew:
+    name: chezmoi
+    state: absent

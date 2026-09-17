@@ -1,0 +1,8 @@
+---
+git_user_name: ""
+git_user_email: ""
+git_signing_key: ""
+git_config: {}
+git_aliases: {}
+git_ignore_global: []
+git_ignore_path: "{{ ansible_facts['env'].HOME }}/.gitignore_global"
