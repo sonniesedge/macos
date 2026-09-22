@@ -122,7 +122,7 @@ zsh_env:
   # coding-agents.zsh in sn-zsh-extensions passes DOTFILES_DIR to nono as a
   # read-only mount for every agent session. It defaults to ~/dotfiles, which
   # does not exist on this machine.
-  DOTFILES_DIR: "{{ ansible_facts['env'].HOME }}/Code/sonniesedge/macos"
+  DOTFILES_DIR: "{{ ansible_facts['env'].HOME }}/Code/sonniesedge/agents"
   # VAULT_ADDR is not set here. sn-zsh-extensions exports it, and it does so
   # before this file loads. Set it again only when sn_zsh_mode is false.
 

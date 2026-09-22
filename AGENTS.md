@@ -68,6 +68,31 @@ It was hardcoded in plain text in the old `dot_zshrc.tmpl` and is not in
 leaked. To restore it, add it to 1Password and reference the UUID in
 `zsh_secrets`.
 
+### Homebrew owns opencode, not mise
+
+opencode was installed twice: by `homebrew_formulae` and by a pin in the
+personal `~/.config/mise`. mise's copy shadowed Homebrew's on `PATH`, so the
+running binary was mise's while opencode's self-updater ran `brew upgrade`
+against the shadowed one. Once the two versions diverged, every launch tried
+and failed to reconcile them, and died with `Unexpected server error`.
+
+Homebrew wins because the updater already targets it, and because
+`/opt/homebrew/bin` needs no extra sandbox grant. mise's copy is reached
+through a shim that reads `~/.config/mise`, which agent sandbox profiles do not
+grant by default. If the mise pin returns, the duplication returns with it.
+
+### `DOTFILES_DIR` points at `agents`, not this repo
+
+`coding-agents.zsh` in sn-zsh-extensions passes `DOTFILES_DIR` to nono as a
+read-only grant for every agent session. It must name the repo holding the real
+opencode config: `~/.config/opencode/opencode.jsonc` is a symlink into
+`agents/settings/opencode/`, and nono resolves symlinks before checking policy.
+Pointing it at this repo leaves that read landing on an ungranted path.
+
+opencode 1.18.32 made an unreadable config fatal at startup, where earlier
+versions continued. The resulting error names neither repo, so this is easy to
+reintroduce and expensive to diagnose.
+
 ## Gotchas
 
 - **`osx_defaults` honours check mode.** A `--check` run reports `changed` but
