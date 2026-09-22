@@ -25,6 +25,7 @@ homebrew_formulae:
   - tree
   - watch
   # shell
+  - nono
   - starship
   # monitoring
   - btop
@@ -118,6 +119,10 @@ zsh_env:
   GITHUB_USERNAME: sonniesedge
   GITHUB_ORG: springernature
   USER_EMAIL: "{{ git_user_email }}"
+  # coding-agents.zsh in sn-zsh-extensions passes DOTFILES_DIR to nono as a
+  # read-only mount for every agent session. It defaults to ~/dotfiles, which
+  # does not exist on this machine.
+  DOTFILES_DIR: "{{ ansible_facts['env'].HOME }}/Code/sonniesedge/macos"
   # VAULT_ADDR is not set here. sn-zsh-extensions exports it, and it does so
   # before this file loads. Set it again only when sn_zsh_mode is false.
 
