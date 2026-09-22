@@ -126,13 +126,19 @@ zsh_env:
   # VAULT_ADDR is not set here. sn-zsh-extensions exports it, and it does so
   # before this file loads. Set it again only when sn_zsh_mode is false.
 
-zsh_secrets:
-  VAULT_GITHUB_TOKEN:
-    uuid: nys3drs2zu3qp7jirairmerhzu   # "Github Vault token"
-    field: notesPlain
-  GITHUB_TOKEN:
-    uuid: ls6rdhcuslacaog4sjdqhp5bxm   # generic GitHub token
-    field: notesPlain
+# Nothing is exported here by default. Every entry becomes an environment
+# variable in a file that sn-zsh sources, so a sandboxed coding agent can read
+# it with plain `env`. nono blocks credential files on disk but passes the
+# environment through, so an exported token defeats that protection.
+#
+# GITHUB_TOKEN was removed. `gh` has its own keyring login with narrower
+# scopes, and it is used automatically once the variable is absent. Note that
+# `gh` prefers GITHUB_TOKEN even when the value is invalid, so never leave a
+# revoked token exported.
+#
+# VAULT_GITHUB_TOKEN was removed. It only feeds `vault-login`, the GitHub auth
+# method. This machine authenticates to Vault with OIDC instead.
+zsh_secrets: {}
 
 zsh_path_prepend:
   - "{{ homebrew_prefix }}/lib/ruby/gems/3.4.0/bin"
