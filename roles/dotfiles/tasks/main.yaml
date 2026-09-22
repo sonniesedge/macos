@@ -1,4 +1,19 @@
 ---
+- name: Make sure that sn-zsh is installed
+  ansible.builtin.stat:
+    path: "{{ sn_zsh_dir }}/zshrc"
+  register: sn_zsh_zshrc
+  when: sn_zsh_mode | bool
+
+- name: Fail if sn-zsh is missing
+  ansible.builtin.fail:
+    msg: >-
+      sn_zsh_mode is true, but {{ sn_zsh_dir }}/zshrc does not exist.
+      Clone springernature/sn-zsh and run 'make install' first.
+  when:
+    - sn_zsh_mode | bool
+    - not sn_zsh_zshrc.stat.exists
+
 - name: Install Oh My Zsh
   ansible.builtin.git:
     repo: https://github.com/ohmyzsh/ohmyzsh.git
@@ -6,7 +21,9 @@
     depth: 1
     version: master
     update: false
-  when: oh_my_zsh_install | bool
+  when:
+    - oh_my_zsh_install | bool
+    - not sn_zsh_mode | bool
 
 - name: Write ~/.zshrc
   ansible.builtin.template:
@@ -15,6 +32,24 @@
     mode: "0600"
     backup: true
   no_log: true
+  when: not sn_zsh_mode | bool
+  tags: [secrets]
+
+- name: Create the sn-zsh custom directory
+  ansible.builtin.file:
+    path: "{{ sn_zsh_custom_dir }}"
+    state: directory
+    mode: "0700"
+  when: sn_zsh_mode | bool
+
+- name: Write the sn-zsh custom fragment
+  ansible.builtin.template:
+    src: sn-zsh-custom.j2
+    dest: "{{ sn_zsh_custom_file }}"
+    mode: "0600"
+    backup: false
+  no_log: true
+  when: sn_zsh_mode | bool
   tags: [secrets]
 
 - name: Make sure ~/.zshrc.local exists for unmanaged tweaks

@@ -11,3 +11,11 @@ zsh_extra_lines: []
 oh_my_zsh_dir: "{{ dotfiles_home }}/.oh-my-zsh"
 oh_my_zsh_install: true
 
+# Set sn_zsh_mode to true on a machine that uses springernature/sn-zsh.
+# The role then writes a custom fragment instead of ~/.zshrc, and sn-zsh
+# sources that fragment. See the README.
+sn_zsh_mode: false
+sn_zsh_dir: "{{ dotfiles_home }}/.sn-zsh"
+sn_zsh_custom_dir: "{{ dotfiles_home }}/.sn-zsh-custom"
+sn_zsh_custom_file: "{{ sn_zsh_custom_dir }}/50-personal.zsh"
+

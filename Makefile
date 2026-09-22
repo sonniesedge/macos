@@ -30,7 +30,7 @@ macos: ## Apply only the macOS defaults role
 shell: ## Apply only the shell role
 	ansible-playbook $(PLAYBOOK) --tags shell --diff
 
-dotfiles: ## Apply only the dotfiles role (writes ~/.zshrc)
+dotfiles: ## Apply only the dotfiles role (writes the zsh config)
 	ansible-playbook $(PLAYBOOK) --tags dotfiles --diff
 
 remove-chezmoi: ## One-shot. Delete the old chezmoi repo, config, cache, and formula

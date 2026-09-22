@@ -1,0 +1,40 @@
+# Managed by Ansible. Edit group_vars/all.yaml, not this file.
+# Sourced by sn-zsh from ~/.sn-zsh-custom/. Contains secrets. Mode is 0600.
+#
+# sn-zsh owns Homebrew on PATH, Oh My Zsh, the prompt, and the plugins.
+# This file holds the personal parts only.
+
+# --- GPG ---------------------------------------------------------------------
+export GPG_TTY=$(tty)
+gpgconf --launch gpg-agent
+
+# --- Environment -------------------------------------------------------------
+{% for key, value in zsh_env | dictsort %}
+export {{ key }}={{ value | quote }}
+{% endfor %}
+
+# --- Secrets from 1Password --------------------------------------------------
+{% for key, item in zsh_secrets | dictsort %}
+export {{ key }}={{ lookup('community.general.onepassword', item.uuid, field=item.field | default('notesPlain')) | quote }}
+{% endfor %}
+
+# --- Node Version Manager ----------------------------------------------------
+export NVM_DIR="$HOME/.nvm"
+[ -s "{{ homebrew_prefix }}/opt/nvm/nvm.sh" ] && \. "{{ homebrew_prefix }}/opt/nvm/nvm.sh"
+[ -s "{{ homebrew_prefix }}/opt/nvm/etc/bash_completion.d/nvm" ] && \. "{{ homebrew_prefix }}/opt/nvm/etc/bash_completion.d/nvm"
+
+# --- PATH --------------------------------------------------------------------
+{% for entry in zsh_path_prepend %}
+export PATH={{ entry | quote }}:$PATH
+{% endfor %}
+{% if zsh_extra_lines %}
+
+# --- Extra -------------------------------------------------------------------
+{% for line in zsh_extra_lines %}
+{{ line }}
+{% endfor %}
+{% endif %}
+
+# --- Local overrides ---------------------------------------------------------
+# Unmanaged. Put machine-specific tweaks here.
+[ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"

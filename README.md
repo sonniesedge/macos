@@ -10,7 +10,7 @@ runs against `localhost` with a local connection. No SSH is necessary.
 | `homebrew` | Adds taps, installs formulae and casks, cleans up old files.  |
 | `git`      | Sets the global git config, aliases, gitignore, and GPG agent.|
 | `shell`    | Checks the login shell and reports how to change it.          |
-| `dotfiles` | Installs Oh My Zsh and writes `~/.zshrc`.                     |
+| `dotfiles` | Installs Oh My Zsh and writes `~/.zshrc`, or a sn-zsh fragment. |
 | `macos`    | Applies macOS `defaults` and restarts the affected apps.      |
 
 ## First run on a new machine
@@ -90,6 +90,9 @@ See `AGENTS.md` for why removal works this way rather than by deleting the line.
 `roles/dotfiles/templates/zshrc.j2`. Do not edit `~/.zshrc` by hand. The next
 run overwrites it. A backup of the old file is kept each time.
 
+On a laptop that uses sn-zsh, set `sn_zsh_mode: true`. Read "Work laptops that
+use sn-zsh" below.
+
 Change the content through `group_vars/all.yaml`.
 
 | Variable           | Holds                                            |
@@ -128,6 +131,51 @@ zsh_secrets:
 
 Because `~/.zshrc` holds real secrets once rendered, the role writes it with
 mode `0600`.
+
+## Work laptops that use sn-zsh
+
+[sn-zsh](https://github.com/springernature/sn-zsh) is the standard Springer
+Nature shell environment. It makes `~/.zshrc` a symlink into `~/.sn-zsh`, and
+it loads Oh My Zsh, Homebrew, the prompt, and the Zscaler setup for you. Both
+projects want to own `~/.zshrc`, so the last one to run wins.
+
+Set `sn_zsh_mode: true` in `group_vars/all.yaml` to stop the fight. The
+`dotfiles` role then leaves `~/.zshrc` alone. It writes
+`~/.sn-zsh-custom/50-personal.zsh` instead, and sn-zsh sources that file at the
+end of startup.
+
+| Part | Owner |
+| ---------------------------------- | ------ |
+| `~/.zshrc`, Oh My Zsh, prompt      | sn-zsh |
+| Homebrew on `PATH`, plugins, Zscaler | sn-zsh |
+| Environment variables and secrets  | this repo |
+| `PATH` prepends, GPG agent, nvm    | this repo |
+
+Install sn-zsh first. The role fails if `~/.sn-zsh/zshrc` is missing.
+
+```bash
+git clone git@github.com:springernature/sn-zsh.git "$HOME/.sn-zsh"
+cd "$HOME/.sn-zsh" && make install
+```
+
+Then set the flag and apply the role.
+
+```yaml
+sn_zsh_mode: true
+```
+
+```bash
+make dotfiles
+```
+
+Homebrew, git, and macOS roles are not affected. They run as before.
+
+Note: sn-zsh reports a problem at session start when the `~/.sn-zsh` repo has
+uncommitted changes. This is why the role writes to `~/.sn-zsh-custom/` and
+never into `~/.sn-zsh/`.
+
+Note: sn-zsh sets `no_unset` after it loads. A command in `zsh_extra_lines`
+that reads an unset variable stops the shell with an error.
 
 ## Removing chezmoi
 

@@ -106,6 +106,9 @@ git_ignore_global:
 
 shell_default: /bin/zsh
 
+# Set to true on a work laptop that uses springernature/sn-zsh.
+sn_zsh_mode: true
+
 oh_my_zsh_install: true
 zsh_theme: robbyrussell
 zsh_plugins:
@@ -115,7 +118,8 @@ zsh_env:
   GITHUB_USERNAME: sonniesedge
   GITHUB_ORG: springernature
   USER_EMAIL: "{{ git_user_email }}"
-  VAULT_ADDR: https://vault.halfpipe.io
+  # VAULT_ADDR is not set here. sn-zsh-extensions exports it, and it does so
+  # before this file loads. Set it again only when sn_zsh_mode is false.
 
 zsh_secrets:
   VAULT_GITHUB_TOKEN:
