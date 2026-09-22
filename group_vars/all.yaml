@@ -5,21 +5,27 @@ homebrew_prefix: "{{ '/opt/homebrew' if ansible_facts['architecture'] == 'arm64'
 
 homebrew_taps:
   - anomalyco/tap
-  - cloudfoundry/tap
   - hashicorp/tap
   - johanneskaufmann/tap
-  - springernature/halfpipe
   - springernature/opensource
 
+# sn-zsh-extensions installs mise, then installs these tools with it:
+# vault, gcloud, gh, kubectl, fly, cf, halfpipe. The list lives in
+# ~/.znap/springernature/sn-zsh-extensions/mise/engineering-enablement.toml.
+# Do not add any of them here. mise puts its shims in ~/.local/bin, which
+# sn-zsh puts before the Homebrew directory on PATH, so a Homebrew copy is
+# installed, never used, and still upgraded on every run.
 homebrew_formulae:
   # cli essentials
-  - gh
+  - fzf
   - git-filter-repo
   - gnupg
   - pinentry-mac
   - pre-commit
   - tree
   - watch
+  # shell
+  - starship
   # monitoring
   - btop
   - htop
@@ -30,29 +36,25 @@ homebrew_formulae:
   - docker
   - docker-compose
   - docker-credential-helper
-  - kubernetes-cli
   - kubevela
   - trivy
   # languages & runtimes
   - golangci-lint
+  - jenv
   - nvm
   - python@3.13
   - ruby@3.4
   - uv
   # tapped
   - anomalyco/tap/opencode
-  - cloudfoundry/tap/cf-cli@8
   - hashicorp/tap/terraform
-  - hashicorp/tap/vault
   - johanneskaufmann/tap/html2markdown
-  - springernature/halfpipe/halfpipe
   - springernature/opensource/opencode-copilot-credit-estimator
 
 homebrew_casks:
   - 1password
   - 1password-cli
   - firefox
-  - gcloud-cli
   - gpg-suite
   - iterm2
   - microsoft-teams
