@@ -161,7 +161,7 @@ macos_defaults:
   - { domain: NSGlobalDomain, key: AppleShowAllExtensions, type: bool, value: "true" }
 
   # Desktop clutter
-  - { domain: com.apple.finder, key: CreateDesktop, type: bool, value: "false" }
+  - { domain: com.apple.finder, key: CreateDesktop, type: bool, value: "true" }
 
   # Dock
   - { domain: com.apple.dock, key: autohide, type: bool, value: "true" }
