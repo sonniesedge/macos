@@ -4,10 +4,6 @@
 # sn-zsh owns Homebrew on PATH, Oh My Zsh, the prompt, and the plugins.
 # This file holds the personal parts only.
 
-# --- GPG ---------------------------------------------------------------------
-export GPG_TTY=$(tty)
-gpgconf --launch gpg-agent
-
 # --- Environment -------------------------------------------------------------
 {% for key, value in zsh_env | dictsort %}
 export {{ key }}={{ value | quote }}

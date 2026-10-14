@@ -19,8 +19,6 @@ homebrew_formulae:
   # cli essentials
   - fzf
   - git-filter-repo
-  - gnupg
-  - pinentry-mac
   - pre-commit
   - tree
   - watch
@@ -70,7 +68,7 @@ homebrew_upgrade_all: false
 
 git_user_name: "Charlie Owen"
 git_user_email: "charlie.owen@springernature.com"
-git_signing_key: "C9D0B8AD05192403"
+git_signing_key: "key::ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKxvG77LUQSjWKRylRW1JQauDR2QC4ESgS1ZGJHSP/Ke"
 
 git_config:
   init.defaultBranch: main
@@ -80,6 +78,7 @@ git_config:
   fetch.prune: "true"
   rebase.autosquash: "true"
   rebase.autostash: "true"
+  gpg.format: ssh
   commit.gpgsign: "true"
   tag.gpgsign: "true"
   diff.colorMoved: zebra

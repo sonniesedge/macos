@@ -47,20 +47,3 @@
     name: core.excludesfile
     value: "{{ git_ignore_path }}"
     scope: global
-
-- name: Make sure the GnuPG home directory exists
-  ansible.builtin.file:
-    path: "{{ ansible_facts['env'].HOME }}/.gnupg"
-    state: directory
-    mode: "0700"
-  when: git_signing_key | length > 0
-
-- name: Use pinentry-mac for GPG so signing works in a GUI session
-  ansible.builtin.lineinfile:
-    path: "{{ ansible_facts['env'].HOME }}/.gnupg/gpg-agent.conf"
-    line: "pinentry-program {{ homebrew_prefix }}/bin/pinentry-mac"
-    regexp: "^pinentry-program "
-    create: true
-    mode: "0600"
-  when: git_signing_key | length > 0
-  notify: Reload gpg-agent

@@ -1,10 +1,6 @@
 # Managed by Ansible. Edit group_vars/all.yaml, not this file.
 # Contains secrets. Mode is 0600.
 
-# --- GPG ---------------------------------------------------------------------
-export GPG_TTY=$(tty)
-gpgconf --launch gpg-agent
-
 # --- Homebrew ----------------------------------------------------------------
 eval "$({{ homebrew_prefix }}/bin/brew shellenv)"
 
